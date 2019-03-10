@@ -50,13 +50,13 @@ void readWavFile(Audio *audio){
 }
 
 
-void getChannel(int channel, Audio *audio, int *data){
+void getChannel(int channel, Audio *audio, int **data){
     // se alloca memoria para los datos
-    data = (int *) malloc(sizeof(int) * audio -> frames);
+    *data = (int *) malloc(sizeof(int) * audio -> frames);
 
     // se itera sobre el numero de datos
     for (int i = 0; i < audio -> frames * audio -> channels; i += audio -> channels){
         // se escoge el canal y se guarda en data
-        data[i] = audio -> data[i + channels];
+            (*data)[i / (audio -> channels)] = audio -> data[i + channel];
     }
 }

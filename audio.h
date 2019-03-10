@@ -23,6 +23,6 @@ void readWavFile(Audio *audio);
 // funcion que muestra informacion de el audio
 void showInfo(Audio *audio);
 // funcion que retorna los datos de un canal
-void getChannel(int channel, Audio *audio, int *data);
+void getChannel(int channel, Audio *audio, int **data);
 
 #endif
