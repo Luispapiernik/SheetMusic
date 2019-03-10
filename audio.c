@@ -9,6 +9,16 @@
 #include "audio.h"
 
 
+void showInfo(Audio *audio){
+    // se imprime informacion relevante de la estructura audio
+    printf("Filename: %s\n", audio -> filename);
+    printf("Channels: %d\n", audio -> channels);
+    printf("Frames: %d\n", audio -> frames);
+    printf("Framerate: %d\n", audio -> framerate);
+
+}
+
+
 void readWavFile(Audio *audio){
     // puntero para abrir el archivo de audio
     SNDFILE *inFile;
@@ -40,11 +50,13 @@ void readWavFile(Audio *audio){
 }
 
 
-void showInfo(Audio *audio){
-    // se imprime informacion relevante de la estructura audio
-    printf("Filename: %s\n", audio -> filename);
-    printf("Channels: %d\n", audio -> channels);
-    printf("Frames: %d\n", audio -> frames);
-    printf("Framerate: %d\n", audio -> framerate);
+void getChannel(int channel, Audio *audio, int *data){
+    // se alloca memoria para los datos
+    data = (int *) malloc(sizeof(int) * audio -> frames);
 
+    // se itera sobre el numero de datos
+    for (int i = 0; i < audio -> frames * audio -> channels; i += audio -> channels){
+        // se escoge el canal y se guarda en data
+        data[i] = audio -> data[i + channels];
+    }
 }
