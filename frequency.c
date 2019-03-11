@@ -12,51 +12,55 @@ double amplitude(double a, double b){
 }
 
 void getFrequency(int channel, Audio *audio){
-    fftw_complex *in, *out;
-    fftw_plan p;
+    // arrays para almacenamiento de los datos de entrada y salida de la
+    // transformada de fourier
+    fftw_complex *input, *output;
+    // para hacer la transformada primero se hace un plan
+    fftw_plan plan;
 
+    // para evitar lineas largas por escribir audio -> frames
     int frames = audio -> frames;
 
-    in = (fftw_complex *) fftw_malloc(sizeof(fftw_complex) * frames);
-    out = (fftw_complex *) fftw_malloc(sizeof(fftw_complex) * frames);
-    p = fftw_plan_dft_1d(frames, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
+    // allocando espacio para los datos
+    input = (fftw_complex *) fftw_malloc(sizeof(fftw_complex) * frames);
+    output = (fftw_complex *) fftw_malloc(sizeof(fftw_complex) * frames);
 
+    // se crea el plan para la transformada, FFTW_MEASURE, FFTW_ESTIMATE
+    plan = fftw_plan_dft_1d(frames, input, output, FFTW_FORWARD, FFTW_ESTIMATE);
+
+    // se copian los datos del canal dado
     int *data;
     getChannel(0, audio, &data);
     for (int i = 0; i < frames; i++){
-        in[i][0] = data[i];
-        in[i][1] = 0;
+        input[i][0] = data[i];
+        input[i][1] = 0;
     }
 
-    fftw_execute(p);
+    // se realiza la transformada
+    fftw_execute(plan);
 
+    // se busca el indice con mayor amplitude
     int indexMax = 0;
     for (int i = 1; i < frames; ++i){
-        // printf("(%lf, %lf)\n", out[i][0], out[i][1]);
-        if(amplitude(out[indexMax][0], out[indexMax][1]) < amplitude(out[i][0], out[i][1])){
+        if(amplitude(output[indexMax][0], output[indexMax][1]) < amplitude(output[i][0], output[i][1])){
             indexMax = i;
         }
     }
 
+    // se escoge la frecuencia de mayor amplitud
     double dt = 1.0 / audio -> framerate;
     double *freq = (double *) malloc(sizeof(double) * frames);
     int index = 0;
-    for (double i = -1.0 / (2 * dt) ; i < 1.0 / (2 * dt) ; i += 1.0 / (dt * audio -> frames)){
+    for (double i = 0; i < 1.0 / (dt); i += 1.0 / (dt * frames)){
         freq[index] = i;
         index++;
     }
 
+    // se imprime la frecuencia
     printf("%lf\n", freq[indexMax]);
 
-    FILE *fp = fopen("datos.txt", "w");
-    for (int i = 0; i < frames; ++i){
-        fprintf(fp, "%lf %lf\n", freq[i], amplitude(out[i][0], out[i][1]));
-    }
-    fclose(fp);
-
-
-
-    fftw_destroy_plan(p);
-    fftw_free(in);
-    fftw_free(out);
+    // se libera memoria
+    fftw_destroy_plan(plan);
+    fftw_free(input);
+    fftw_free(output);
 }
