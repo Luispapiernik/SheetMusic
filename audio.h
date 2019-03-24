@@ -1,6 +1,11 @@
 #ifndef AUDIO_H
 #define AUDIO_H
 
+// Para valores booleanos
+typedef enum{
+    False,
+    True
+}Bool;
 
 // Estructura que representa audio
 typedef struct important{
@@ -22,7 +27,9 @@ typedef struct important{
 void readWavFile(Audio *audio);
 // funcion que muestra informacion de el audio
 void showInfo(Audio *audio);
-// funcion que retorna los datos de un canal
-void getChannel(int channel, Audio *audio, int **data);
+// funcion que obtiene los datos de un canal
+void getChannel(int channel, Audio *audio, int **data, Bool allocate);
+// funcion que obtiene los datos de un canal desde una posicion dada
+void getChannelAt(int channel, Audio *audio, int initialFrame, int length, int **data, Bool allocate);
 
 #endif
