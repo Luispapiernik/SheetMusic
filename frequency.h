@@ -4,9 +4,9 @@
 
 #include "audio.h"
 
-double amplitude(double a, double b);
-
-void getFrequency(int channel, Audio *audio);
+void getFrequencyTest(int channel, Audio *audio);
+double getFrequencies(int channel, Audio *audio, int subLength, double **frequenciesAtTime);
+// void getFrequency(int channel, Audio *audio);
 
 
 #endif

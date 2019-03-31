@@ -8,7 +8,7 @@ typedef enum{
 }Bool;
 
 // Estructura que representa audio
-typedef struct important{
+typedef struct{
     // nombre del archivo desde el que se cargan los datos
     char *filename;
     // datos del archivo
