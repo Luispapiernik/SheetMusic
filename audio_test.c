@@ -4,7 +4,7 @@
 #include "audio.h"
 
 
-int main(int argc, char const *argv[]){
+int main(int argc, char *argv[]){
     // se crea la estructura audio
     Audio audio;
 
@@ -19,7 +19,7 @@ int main(int argc, char const *argv[]){
 
     // copia los datos del canal 1 en data
     int *data;
-    getChannel(0, &audio, &data);
+    getChannel(0, &audio, &data, True);
 
     // se imprimen los datos
     for (int i = 0; i < audio.frames * audio.channels; i += audio.channels){

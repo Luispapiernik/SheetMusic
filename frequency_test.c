@@ -4,7 +4,7 @@
 #include "frequency.h"
 
 
-int main(int argc, char const *argv[]){
+int main(int argc, char *argv[]){
     // se crea la estructura audio
     Audio audio;
 
