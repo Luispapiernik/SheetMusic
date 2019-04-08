@@ -34,6 +34,18 @@ cleanFrequencyExec:
 	rm frequency_test
 
 
+.PHONY: makeParserTest
+makeParserTest: parser_test.o
+
+.PHONY: cleanParserTest
+cleanParserTest:
+	rm parser_test.o
+
+.PHONY: cleanParserExec
+cleanParserExec:
+	rm parser_test
+
+
 .PHONY: cleanExec
 cleanExec:
 	rm audio_test frequency_test sheetMusic
