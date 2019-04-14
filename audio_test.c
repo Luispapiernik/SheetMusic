@@ -19,15 +19,22 @@ int main(int argc, char *argv[]){
 
     // copia los datos del canal 1 en data
     int *data;
-    getChannel(0, &audio, &data, True);
+    getChannel(CHANNEL1, &audio, &data, True);
+
+    int *dataAt = (int *) malloc(sizeof(int) * audio.framerate);
 
     // se imprimen los datos
-    for (int i = 0; i < audio.frames * audio.channels; i += audio.channels){
-        printf("%d - %d\n", data[i / audio.channels], audio.data[i]);
+    for (int i = 0; i < audio.frames; i++){
+        if(i % audio.framerate == 0)
+            getChannelAt(CHANNEL1, &audio, i, audio.framerate, &dataAt, False);
+
+        printf("%d - %d - %d\n", audio.data[i * audio.channels], data[i], dataAt[i % audio.framerate]);
     }
 
     // se libea la memoria
     free(audio.data);
+    free(data);
+    free(dataAt);
 
     return 0;
 }

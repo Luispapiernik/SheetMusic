@@ -1,12 +1,11 @@
 #ifndef FREQUENCY_H
 #define FREQUENCY_H
 
-
 #include "audio.h"
 
-void getFrequencyTest(int channel, Audio *audio);
-double getFrequencies(int channel, Audio *audio, int subLength, double **frequenciesAtTime);
-// void getFrequency(int channel, Audio *audio);
 
+// esta funcion retorna un array de frecuencias, cada frecuencia es extraida de los array que
+// quedan como resultado de dividir todo los datos del audio en subarray de longitud subLength
+double getFrequencies(int channel, Audio *audio, int subLength, double **frequenciesAtTime);
 
 #endif

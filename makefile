@@ -1,11 +1,12 @@
-OBJECTS = frequency.o audio.o
+OBJECTS = frequency.o audio.o miscellaneous.o
 FLAGS = -lm -lsndfile -lfftw3
-
-sheetMusic:
+CC = gcc
 
 $(OBJECTS): frequency.h audio.h
+parser.o: miscellaneous.h parser.h
 audio_test.o: audio.h
-frequency_test.o: audio.h frequency.h
+frequency_test.o: audio.h frequency.h miscellaneous.h
+parser_test.o: parser.h
 
 
 .PHONY: makeAudioTest
@@ -35,7 +36,8 @@ cleanFrequencyExec:
 
 
 .PHONY: makeParserTest
-makeParserTest: parser_test.o
+makeParserTest: miscellaneous.o parser.o parser_test.o
+	gcc -o parser_test miscellaneous.o parser.o parser_test.o $(FLAGS)
 
 .PHONY: cleanParserTest
 cleanParserTest:
@@ -48,8 +50,8 @@ cleanParserExec:
 
 .PHONY: cleanExec
 cleanExec:
-	rm audio_test frequency_test sheetMusic
+	rm audio_test frequency_test parser_test sheetMusic
 
 .PHONY: clean
 clean:
-	rm $(OBJECTS) audio_test.o frequency_test.o
+	rm *.o

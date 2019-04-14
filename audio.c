@@ -7,6 +7,8 @@
 
 // para la referencia a la estructura audio
 #include "audio.h"
+// para la referencia a la estructura Bool
+#include "miscellaneous.h"
 
 
 void showInfo(Audio *audio){
@@ -68,14 +70,9 @@ void getChannelAt(int channel, Audio *audio, int initialFrame, int length, int *
     if(allocate)
         *data = (int *) malloc(sizeof(int) * length);
 
-    // // se itera sobre el numero de datos
-    // int index = 0;
-    // for (int i = initialFrame * audio -> channels; i < length * audio -> channels; i += audio -> channels){
-    //     // se escoge el canal y se guarda en data
-    //         (*data)[index++] = audio -> data[i + channel];
-    // }
-
+    // se itera sobre la cantidad de datos que se quieren leer
     for (int i = 0; i < length; i++){
+        // se escoge el canal y se guarda en data
         (*data)[i] = audio -> data[(initialFrame + i) * audio -> channels + channel];
     }
 }
