@@ -6,6 +6,6 @@
 
 // esta funcion retorna un array de frecuencias, cada frecuencia es extraida de los array que
 // quedan como resultado de dividir todo los datos del audio en subarray de longitud subLength
-double getFrequencies(int channel, Audio *audio, int subLength, double **frequenciesAtTime);
+int getFrequencies(int channel, Audio *audio, int subLength, double **frequenciesAtTime);
 
 #endif

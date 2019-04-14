@@ -6,10 +6,7 @@ int main(int argc, char *argv[]){
     // test parse frequency
     Register reg;
 
-    reg.initial_eighth = 1;
-    reg.final_eighth = 3;
-
-    fillRegister(&reg);
+    fillRegister(&reg, 1, 3);
 
     printf("Test Frequency Parser\n");
     printf("length: %d\n", reg.length);

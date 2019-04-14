@@ -1,6 +1,7 @@
 #ifndef MISCELLANEOUS_H
 #define MISCELLANEOUS_H
 
+
 // Para valores booleanos, esto es mas
 // legible que pasar 1 o 0 a una funcion
 typedef enum{
@@ -19,6 +20,9 @@ double amplitude(double a, double b);
 
 // esta  funcion convierte de frames a segundos
 double frames2seconds(int frames, int framerate);
+
+// esta funcion convierte segundos a frames
+int seconds2frames(double seconds, int framerate);
 
 // esta funcion retorna el numero de veces que b esta en a
 int intQuotient(double a, double b);

@@ -18,9 +18,6 @@
 typedef struct{
     int length;
 
-    int initial_eighth;
-    int final_eighth;
-
     double *frequencies[2];
     char **notes;
     char notNote[2];
@@ -39,7 +36,7 @@ typedef struct{
     int SEMIFUSA;
 }MusicalTime;
 
-void fillRegister(Register *reg);
+void fillRegister(Register *reg, int initial_eighth, int final_eighth);
 void parseNote(double frequency, Register reg, char *string);
 
 // esta funcion recibe tiempo en segundos y lo convierte a tiempo musical

@@ -8,8 +8,8 @@
 void getNote(int note, int eighth, char *string);
 
 
-void fillRegister(Register *reg){
-    int n = reg -> final_eighth - reg -> initial_eighth + 1;
+void fillRegister(Register *reg, int initial_eighth, int final_eighth){
+    int n = final_eighth - initial_eighth + 1;
 
     reg -> length = n * 12;
 
@@ -19,15 +19,15 @@ void fillRegister(Register *reg){
     reg -> notes = (char **) malloc(sizeof(char *) * n * 12);
 
     double freq = 0;
-    for(int eighth = reg -> initial_eighth; eighth < reg -> final_eighth + 1; eighth++){
+    for(int eighth = initial_eighth; eighth < final_eighth + 1; eighth++){
         for(int note = 1; note < 13; note++){
             freq = frequency(note, eighth);
 
-            reg -> frequencies[0][(eighth - reg -> initial_eighth) * 12 + note - 1] = freq;
-            reg -> frequencies[1][(eighth - reg -> initial_eighth) * 12 + note - 1] = freq;
+            reg -> frequencies[0][(eighth - initial_eighth) * 12 + note - 1] = freq;
+            reg -> frequencies[1][(eighth - initial_eighth) * 12 + note - 1] = freq;
             
-            reg -> notes[(eighth - reg -> initial_eighth) * 12 + note - 1] = (char *) malloc(sizeof(char) * 4);
-            getNote(note, eighth, reg -> notes[(eighth - reg -> initial_eighth) * 12 + note - 1]);
+            reg -> notes[(eighth - initial_eighth) * 12 + note - 1] = (char *) malloc(sizeof(char) * 4);
+            getNote(note, eighth, reg -> notes[(eighth - initial_eighth) * 12 + note - 1]);
         }
     }
 

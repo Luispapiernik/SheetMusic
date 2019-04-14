@@ -13,6 +13,11 @@ double frames2seconds(int frames, int framerate){
     return (double) frames / framerate;
 }
 
+int seconds2frames(double seconds, int framerate){
+    return (int) (seconds * framerate);
+}
+
+
 void division(double a, double b, int *quotient, double *remainder){
     *quotient = 0;
     *remainder = 0;

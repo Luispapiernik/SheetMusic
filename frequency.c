@@ -1,5 +1,6 @@
 // uso de malloc
 #include <stdlib.h>
+#include <math.h>
 
 // libreria que realiza la transformada
 #include <fftw3.h>
@@ -27,7 +28,7 @@ void fillFrequencies(int length, int framerate, double **frequencies){
 }
 
 
-double getFrequencies(int channel, Audio *audio, int subLength, double **frequenciesAtTime){
+int getFrequencies(int channel, Audio *audio, int subLength, double **frequenciesAtTime){
     fftw_complex *in, *out;
     fftw_plan my_plan;
 
@@ -37,7 +38,8 @@ double getFrequencies(int channel, Audio *audio, int subLength, double **frequen
     // FFTW_ESTIMATE, FFTW_MEASURE
     my_plan = fftw_plan_dft_1d(subLength, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
 
-    *frequenciesAtTime = (double *) malloc(sizeof(double) * ((*audio).frames / (*audio).framerate));
+    int length = (*audio).frames / subLength;
+    *frequenciesAtTime = (double *) malloc(sizeof(double) * length);
 
     double *freq;
     fillFrequencies(subLength, (*audio).framerate, &freq);
@@ -62,7 +64,7 @@ double getFrequencies(int channel, Audio *audio, int subLength, double **frequen
             }
         }
 
-        (*frequenciesAtTime)[i / subLength] = freq[indexMax];
+        (*frequenciesAtTime)[i / subLength] = fabs(freq[indexMax]);
     }
 
     fftw_destroy_plan(my_plan);
@@ -72,5 +74,5 @@ double getFrequencies(int channel, Audio *audio, int subLength, double **frequen
     free(dataAt);
     free(freq);
 
-    return frames2seconds(subLength, (*audio).framerate);
+    return length;
 }

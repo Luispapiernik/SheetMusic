@@ -5,10 +5,10 @@
 #include <stdio.h>
 #include <sndfile.h>
 
-// para la referencia a la estructura audio
-#include "audio.h"
 // para la referencia a la estructura Bool
 #include "miscellaneous.h"
+// para la referencia a la estructura audio
+#include "audio.h"
 
 
 void showInfo(Audio *audio){

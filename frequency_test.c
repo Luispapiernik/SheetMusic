@@ -1,9 +1,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "miscellaneous.h"
 #include "audio.h"
 #include "frequency.h"
-#include "miscellaneous.h"
 
 
 int main(int argc, char *argv[]){
@@ -20,11 +20,19 @@ int main(int argc, char *argv[]){
     showInfo(&audio);
 
     double *frequencies;
-    double seconds = getFrequencies(CHANNEL1, &audio, audio.framerate, &frequencies);
+    int length = getFrequencies(CHANNEL1, &audio, audio.framerate, &frequencies);
 
-    printf("Segundos: %lf\n", seconds);
+    printf("Length: %d\n", length);
 
     for(int i = 0; i < audio.frames / audio.framerate; i++){
+        printf("Frequency: %lf\n", frequencies[i]);
+    }
+
+    length = getFrequencies(CHANNEL1, &audio, audio.framerate / 2, &frequencies);
+
+    printf("Length: %d\n", length);
+
+    for(int i = 0; i < audio.frames * 2 / audio.framerate; i++){
         printf("Frequency: %lf\n", frequencies[i]);
     }
 
