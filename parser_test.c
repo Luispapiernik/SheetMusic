@@ -9,16 +9,13 @@ int main(int argc, char *argv[]){
     fillRegister(&reg, 1, 3);
 
     printf("Test Frequency Parser\n");
-    printf("length: %d\n", reg.length);
+    showRegister(reg);
 
-    for(int i = 0; i < reg.length; i++){
-        printf("%s - ", reg.notes[i]);
-        printf("%lf %lf\n", reg.frequencies[0][i], reg.frequencies[1][i]);
-    }
+    Note note = parseFrequency(33, reg);
+    showNote(note);
 
-    char string[4];
-    parseNote(33, reg, string);
-    printf("%lf %s\n", 33.0, string);
+    note = parseFrequency(20, reg);
+    showNote(note);
 
     // test parse time
     printf("\nTest Time Parser\n");

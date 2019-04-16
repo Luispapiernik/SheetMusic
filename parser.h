@@ -1,7 +1,10 @@
 #ifndef PARSER_H
 #define PARSER_H
 
+#include "miscellaneous.h"
+
 // definicion de las notas musicales
+#define NOTNOTE 0
 #define C 1
 #define CS 2
 #define D 3
@@ -16,15 +19,22 @@
 #define B 12
 
 typedef struct{
+    int note;
+    int eighth;
+}Note;
+
+typedef struct{
     int length;
 
     double *frequencies[2];
-    char **notes;
-    char notNote[2];
+    Note *notes;
+
+    Note notNote;
 }Register;
 
 typedef struct{
     double seconds;
+    double remainder;
     int tempo;
 
     int REDONDA;
@@ -36,12 +46,16 @@ typedef struct{
     int SEMIFUSA;
 }MusicalTime;
 
+void showNote(Note note);
+void showRegister(Register reg);
+void showMusicalTime(MusicalTime t);
+
 void fillRegister(Register *reg, int initial_eighth, int final_eighth);
-void parseNote(double frequency, Register reg, char *string);
+Note parseFrequency(double frequency, Register reg);
 
 // esta funcion recibe tiempo en segundos y lo convierte a tiempo musical
 MusicalTime seconds2MusicalTime(double seconds, int tempo);
 
-void showMusicalTime(MusicalTime t);
+void parseNote(Note note, MusicalTime t, char *string);
 
 #endif

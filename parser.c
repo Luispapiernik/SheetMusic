@@ -5,7 +5,85 @@
 #include "parser.h"
 #include "miscellaneous.h"
 
-void getNote(int note, int eighth, char *string);
+
+void note2string(Note note, char *string){
+    switch (note.note){
+        case C:
+            sprintf(string, "C%d", note.eighth);
+            break;
+        case CS:
+            sprintf(string, "C#%d", note.eighth);
+            break;
+        case D:
+            sprintf(string, "D%d", note.eighth);
+            break;
+        case DS:
+            sprintf(string, "D#%d", note.eighth);
+            break;
+        case E:
+            sprintf(string, "E%d", note.eighth);
+            break;
+        case F:
+            sprintf(string, "F%d", note.eighth);
+            break;
+        case FS:
+            sprintf(string, "F#%d", note.eighth);
+            break;
+        case G:
+            sprintf(string, "G%d", note.eighth);
+            break;
+        case GS:
+            sprintf(string, "G#%d", note.eighth);
+            break;
+        case A:
+            sprintf(string, "A%d", note.eighth);
+            break;
+        case AS:
+            sprintf(string, "A#%d", note.eighth);
+            break;
+        case B:
+            sprintf(string, "B%d", note.eighth);
+            break;
+        default:
+            strcpy(string, " ");
+            break;
+    }
+}
+
+
+void showNote(Note note){
+    char string[5];
+
+    note2string(note, string);
+
+    printf("%s\n", string);
+}
+
+void showRegister(Register reg){
+    printf("length: %d\n", reg.length);
+
+    char string[5];
+
+    for(int i = 0; i < reg.length; i++){
+        note2string(reg.notes[i], string);
+        printf("%s - ", string);
+        printf("%lf %lf\n", reg.frequencies[0][i], reg.frequencies[1][i]);
+    }
+}
+
+void showMusicalTime(MusicalTime t){
+    printf("TIME\n");
+    printf("Seconds: %lf\n", t.seconds);
+    printf("Tempo: %d\n", t.tempo);
+
+    printf("REDONDAS: %d\n", t.REDONDA);
+    printf("BLANCAS: %d\n", t.BLANCA);
+    printf("NEGRAS: %d\n", t.NEGRA);
+    printf("CORCHEAS: %d\n", t.CORCHEA);
+    printf("SEMICORCHEAS: %d\n", t.SEMICORCHEA);
+    printf("FUSAS: %d\n", t.FUSA);
+    printf("SEMIFUSAS: %d\n", t.SEMIFUSA);
+}
 
 
 void fillRegister(Register *reg, int initial_eighth, int final_eighth){
@@ -16,7 +94,7 @@ void fillRegister(Register *reg, int initial_eighth, int final_eighth){
     reg -> frequencies[0] = (double *) malloc(sizeof(double) * n * 12);
     reg -> frequencies[1] = (double *) malloc(sizeof(double) * n * 12);
 
-    reg -> notes = (char **) malloc(sizeof(char *) * n * 12);
+    reg -> notes = (Note *) malloc(sizeof(Note) * n * 12);
 
     double freq = 0;
     for(int eighth = initial_eighth; eighth < final_eighth + 1; eighth++){
@@ -26,13 +104,11 @@ void fillRegister(Register *reg, int initial_eighth, int final_eighth){
             reg -> frequencies[0][(eighth - initial_eighth) * 12 + note - 1] = freq;
             reg -> frequencies[1][(eighth - initial_eighth) * 12 + note - 1] = freq;
             
-            reg -> notes[(eighth - initial_eighth) * 12 + note - 1] = (char *) malloc(sizeof(char) * 4);
-            getNote(note, eighth, reg -> notes[(eighth - initial_eighth) * 12 + note - 1]);
+            reg -> notes[(eighth - initial_eighth) * 12 + note - 1] = (Note) {note, eighth};
         }
     }
 
-    (reg -> notNote)[0] = ' ';
-    (reg -> notNote)[0] = '\0';
+    reg -> notNote = (Note) {0, 0};
 
     double upperLimit;
     for(int i = 0; i < reg -> length - 1; i++){
@@ -43,58 +119,16 @@ void fillRegister(Register *reg, int initial_eighth, int final_eighth){
 }
 
 
-void parseNote(double frequency, Register reg, char *string){
+Note parseFrequency(double frequency, Register reg){
     for(int i = 0; i < reg.length; i++){
         if((reg.frequencies[0][i] <= frequency) && (frequency < reg.frequencies[1][i])){
-            strcpy(string, reg.notes[i]);
-            return;
+            return reg.notes[i];
         }
     }
 
-   strcpy(string, reg.notNote);
+  return reg.notNote;
 }
 
-
-void getNote(int note, int eighth, char *string){
-    switch (note){
-        case C:
-            sprintf(string, "C%d", eighth);
-            break;
-        case CS:
-            sprintf(string, "C#%d", eighth);
-            break;
-        case D:
-            sprintf(string, "D%d", eighth);
-            break;
-        case DS:
-            sprintf(string, "D#%d", eighth);
-            break;
-        case E:
-            sprintf(string, "E%d", eighth);
-            break;
-        case F:
-            sprintf(string, "F%d", eighth);
-            break;
-        case FS:
-            sprintf(string, "F#%d", eighth);
-            break;
-        case G:
-            sprintf(string, "G%d", eighth);
-            break;
-        case GS:
-            sprintf(string, "G#%d", eighth);
-            break;
-        case A:
-            sprintf(string, "A%d", eighth);
-            break;
-        case AS:
-            sprintf(string, "A#%d", eighth);
-            break;
-        case B:
-            sprintf(string, "B%d", eighth);
-            break;
-    }
-}
 
 MusicalTime seconds2MusicalTime(double seconds, int tempo){
     MusicalTime t;
@@ -136,20 +170,6 @@ MusicalTime seconds2MusicalTime(double seconds, int tempo){
 }
 
 
-void showMusicalTime(MusicalTime t){
-    printf("Seconds: %lf\n", t.seconds);
-    printf("Tempo: %d\n", t.tempo);
-
-    printf("REDONDAS: %d\n", t.REDONDA);
-    printf("BLANCAS: %d\n", t.BLANCA);
-    printf("NEGRAS: %d\n", t.NEGRA);
-    printf("CORCHEAS: %d\n", t.CORCHEA);
-    printf("SEMICORCHEAS: %d\n", t.SEMICORCHEA);
-    printf("FUSAS: %d\n", t.FUSA);
-    printf("SEMIFUSAS: %d\n", t.SEMIFUSA);
-}
-
-
-void parseFrequencies(int length, double *frequencies, char **filechar){
-
+void parseNote(Note note, MusicalTime t, char *string){
+    string = (char *) malloc(sizeof(char) * 10);
 }
