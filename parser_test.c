@@ -22,4 +22,10 @@ int main(int argc, char *argv[]){
     showMusicalTime(seconds2MusicalTime(1, 60));
     showMusicalTime(seconds2MusicalTime(1.75, 120));
 
+    // test para parse note
+    char *string;
+    parseNote(parseFrequency(33, reg), seconds2MusicalTime(1.75, 120), &string);
+
+    printf("%s\n", string);
+
 }

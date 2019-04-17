@@ -18,6 +18,21 @@
 #define AS 11
 #define B 12
 
+// definicion de tiempo musical
+#define REDONDA_ 0
+#define REDONDA 1
+#define BLANCA_ 2
+#define BLANCA 3
+#define NEGRA_ 4
+#define NEGRA 5
+#define CORCHEA_ 6
+#define CORCHEA 7
+#define SEMICORCHEA_ 8
+#define SEMICORCHEA 9
+#define FUSA_ 10
+#define FUSA 11
+#define SEMIFUSA 12
+
 typedef struct{
     int note;
     int eighth;
@@ -37,13 +52,13 @@ typedef struct{
     double remainder;
     int tempo;
 
-    int REDONDA;
-    int BLANCA;
-    int NEGRA;
-    int CORCHEA;
-    int SEMICORCHEA;
-    int FUSA;
-    int SEMIFUSA;
+    int redonda;
+    int blanca;
+    int negra;
+    int corchea;
+    int semicorchea;
+    int fusa;
+    int semifusa;
 }MusicalTime;
 
 void showNote(Note note);
@@ -56,6 +71,8 @@ Note parseFrequency(double frequency, Register reg);
 // esta funcion recibe tiempo en segundos y lo convierte a tiempo musical
 MusicalTime seconds2MusicalTime(double seconds, int tempo);
 
-void parseNote(Note note, MusicalTime t, char *string);
+void parseNote(Note note, MusicalTime t, char **string);
+
+void parseFrequencies(char *filename, int length, double seconds, int tempo, double *frequencies, Register reg);
 
 #endif

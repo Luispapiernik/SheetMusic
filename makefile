@@ -1,57 +1,73 @@
-OBJECTS = frequency.o audio.o miscellaneous.o
-FLAGS = -lm -lsndfile -lfftw3
 CC = gcc
+CFLAGS = -Wall -lm -lsndfile -lfftw3
+DEPENDENCIES = miscellaneous.h audio.h frequency.h parser.h
+OBJECTS = miscellaneous.o audio.o frequency.o parser.o
 
-$(OBJECTS): frequency.h audio.h
-parser.o: miscellaneous.h parser.h
+################################################################
+# compilacion del programa principal
+sheetMusic: sheetMusic.o
+	$(CC) $(OBJECTS) sheetMusic.o -o sheetMusic $(CFLAGS)
+
+sheetMusic.o: $(DEPENDENCIES) $(OBJECTS)
+################################################################
+
+################################################################
+# para testear la funcionalidad del modulo audio.h audio.c
+makeAudioTest: audio.o audio_test.o
+	$(CC) audio.o audio_test.o -o audio_test $(CFLAGS)
+
+audio.o: miscellaneous.h audio.h
 audio_test.o: audio.h
-frequency_test.o: audio.h frequency.h miscellaneous.h
-parser_test.o: parser.h
 
-
-.PHONY: makeAudioTest
-makeAudioTest: $(OBJECTS) audio_test.o
-	gcc -o audio_test audio_test.o $(OBJECTS) $(FLAGS)
-
-.PHONY: cleanAudioTest
 cleanAudioTest:
+	rm miscellaneous.o
+	rm audio.o
 	rm audio_test.o
+################################################################
 
-.PHONY: cleanAudioExec
-cleanAudioExec:
-	rm audio_test
+################################################################
+# para testear la funcionalidad en el modulo frequency.h frequency.c
+makeFrequencyTest: miscellaneous.o audio.o frequency.o frequency_test.o
+	$(CC) miscellaneous.o audio.o frequency.o frequency_test.o -o frequency_test $(CFLAGS)
 
+frequency.o: miscellaneous.h audio.h miscellaneous.o audio.o
+frequency_test.o: miscellaneous.h audio.h frequency.h miscellaneous.o audio.o frequency.o
 
-.PHONY: makeFrequencyTest
-makeFrequencyTest: $(OBJECTS) frequency_test.o
-	gcc -o frequency_test frequency_test.o $(OBJECTS) $(FLAGS)
-
-.PHONY: cleanFrequencyTest
 cleanFrequencyTest:
+	rm miscellaneous.o
+	rm audio.o
+	rm frequency.o
 	rm frequency_test.o
+################################################################
 
-.PHONY: cleanFrequencyExec
-cleanFrequencyExec:
-	rm frequency_test
-
-
-.PHONY: makeParserTest
+################################################################
+# para testear la funcionalidad en el modulo parser.h parser.c
 makeParserTest: miscellaneous.o parser.o parser_test.o
-	gcc -o parser_test miscellaneous.o parser.o parser_test.o $(FLAGS)
+	$(CC) miscellaneous.o parser.o parser_test.o -o parser_test $(CFLAGS)
 
-.PHONY: cleanParserTest
+parser.o: miscellaneous.h parser.h miscellaneous.o
+parser_test.o: parser.h parser.o
+
 cleanParserTest:
+	rm miscellaneous.o
+	rm parser.o
 	rm parser_test.o
+################################################################
 
-.PHONY: cleanParserExec
-cleanParserExec:
+
+################################################################
+# general rules
+cleanObjects:
+	rm *.o
+
+cleanExec:
+	rm audio_test
+	rm frequency_test
 	rm parser_test
 
-
-.PHONY: cleanExec
-cleanExec:
-	rm audio_test frequency_test parser_test sheetMusic
-
-.PHONY: clean
-clean:
+cleanAll:
 	rm *.o
+	rm audio_test
+	rm frequency_test
+	rm parser_test 
+################################################################

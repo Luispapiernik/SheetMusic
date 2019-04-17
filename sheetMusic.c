@@ -9,15 +9,25 @@
 #include "parser.h"
 
 // grupos de los argumentos
-#define INPUT 0
+#define IO 0
+#define FREQUENCY 1
+#define PARSER 2
 
 
 // se usa para guardar argumentos ingresados por el usuario
 typedef struct{
-    char *filename;
-    int tempo;
-    double dt;
+    // input output
+    char *inputfile;
+    char *outputfile;
+
+    // get frequencies
     int channel;
+    double dt;
+
+    // parser
+    int tempo;
+    int initial_eighth;
+    int final_eighth;
 }Arguments;
 
 void slave(Arguments arguments);
@@ -26,17 +36,26 @@ error_t parse_opt(int key, char *arg, struct argp_state *state){
     Arguments *arguments = state -> input;
 
     switch (key){
-        case 'f':
-            arguments -> filename = arg;
+        case 'i':
+            arguments -> inputfile = arg;
             break;
-        case 't':
-            arguments -> tempo = atoi(arg);
+        case 'o':
+            arguments -> outputfile = arg;
+            break;
+        case 'c':
+            arguments -> channel = atoi(arg);
             break;
         case 'd':
             arguments -> dt = atof(arg);
             break;
-        case 'c':
-            arguments -> channel = atoi(arg);
+        case 't':
+            arguments -> tempo = atoi(arg);
+            break;
+        case 'p':
+            arguments -> initial_eighth = atoi(arg);
+            break;
+        case 'f':
+            arguments -> final_eighth = atoi(arg);
             break;
 
         default:
@@ -59,16 +78,26 @@ int main(int argc, char **argv){
     // opciones 
     static struct argp_option options[] = {
         // archivo de entrada
-        {"filename", 'f', "FILENAME", 0, "Archivo de audio", INPUT},
-        {"tempo", 't', "TEMPO", 0, "Tempo del audio", INPUT},
-        {"dt", 'd', "DT", 0, "Division temporal del audio", INPUT},
-        {"channel", 'c', "CHANNEL", 0, "Canal a analizar", INPUT}
+        {"inputfile", 'i', "FILENAME", 0, "Archivo de audio", IO},
+        {"outputfile", 'o', "FILENAME", 0, "nombre del archivo de salida", IO},
+        {"channel", 'c', "CHANNEL", 0, "Canal a analizar", FREQUENCY},
+        {"dt", 'd', "DT", 0, "Division temporal del audio", FREQUENCY},
+        {"tempo", 't', "TEMPO", 0, "Tempo del audio", PARSER},
+        {"initial-eighth", 'p', "INITIAL_EIGHTH", 0, "Tempo del audio", PARSER},
+        {"final-eighth", 'f', "FINAL_EIGHTH", 0, "Tempo del audio", PARSER}
     };
-
-    Arguments arguments;
 
     // se crea el parseador
     static struct argp argp = {options, parse_opt, 0, doc};
+
+    Arguments arguments;
+    // valores por defecto
+    arguments.outputfile = "output.ly";
+    arguments.channel = 0;
+    arguments.dt = 0.0625;
+    arguments.tempo = 60;
+    arguments.initial_eighth = 4;
+    arguments.final_eighth = 6;
 
     // se parsean los argumentos
     argp_parse(&argp, argc, argv, 0, 0, &arguments);
@@ -80,15 +109,18 @@ int main(int argc, char **argv){
 
 void slave(Arguments arguments){
     // se verifica que los argumentos llegaron bien
-    printf("filename: %s\n", arguments.filename);
-    printf("tempo: %d\n", arguments.tempo);
-    printf("dt: %lf\n", arguments.dt);
+    printf("inputfile: %s\n", arguments.inputfile);
+    printf("outputfile: %s\n", arguments.outputfile);
     printf("channel: %d\n", arguments.channel);
+    printf("dt: %lf\n", arguments.dt);
+    printf("tempo: %d\n", arguments.tempo);
+    printf("initial eighth: %d\n", arguments.initial_eighth);
+    printf("final eighth: %d\n", arguments.final_eighth);
 
     // lectura del audio
     Audio audio;
 
-    audio.filename = arguments.filename;
+    audio.filename = arguments.inputfile;
     readWavFile(&audio);
 
     // extraccion de las frecuencias
@@ -101,9 +133,5 @@ void slave(Arguments arguments){
     Register reg;
     fillRegister(&reg, 1, 7);
 
-    char string[4];
-    for(int i = 0; i < length; i++){
-        parseNote(frequencies[i], reg, string);
-        printf("Frequency: %lf, Note: %s\n", frequencies[i], string);
-    }
+    parseFrequencies(arguments.outputfile, length, arguments.dt, arguments.tempo, frequencies, reg);
 }
