@@ -64,6 +64,7 @@ cleanExec:
 	rm audio_test
 	rm frequency_test
 	rm parser_test
+	rm sheetMusic
 
 cleanAll:
 	rm *.o

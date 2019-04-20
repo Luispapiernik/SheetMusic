@@ -96,7 +96,7 @@ int main(int argc, char **argv){
     arguments.channel = 0;
     arguments.dt = 0.0625;
     arguments.tempo = 60;
-    arguments.initial_eighth = 4;
+    arguments.initial_eighth = 1;
     arguments.final_eighth = 6;
 
     // se parsean los argumentos
@@ -133,5 +133,14 @@ void slave(Arguments arguments){
     Register reg;
     fillRegister(&reg, 1, 7);
 
-    parseFrequencies(arguments.outputfile, length, arguments.dt, arguments.tempo, frequencies, reg);
+    // informacion del music sheet
+    MusicSheetInfo info;
+    info.filename = arguments.outputfile;
+    info.tempo = arguments.tempo;
+
+    parseFrequencies(info, length, arguments.dt, frequencies, reg);
+
+    char comand[500];
+    sprintf(comand, "lilypond %s", arguments.outputfile); 
+    system(comand);
 }

@@ -61,6 +61,19 @@ typedef struct{
     int semifusa;
 }MusicalTime;
 
+
+typedef struct{
+    char *filename;
+    char *version;
+
+    // header
+    char *title;
+    char *composer;
+    
+    // body
+    int tempo;
+}MusicSheetInfo;
+
 void showNote(Note note);
 void showRegister(Register reg);
 void showMusicalTime(MusicalTime t);
@@ -73,6 +86,6 @@ MusicalTime seconds2MusicalTime(double seconds, int tempo);
 
 void parseNote(Note note, MusicalTime t, char **string);
 
-void parseFrequencies(char *filename, int length, double seconds, int tempo, double *frequencies, Register reg);
+void parseFrequencies(MusicSheetInfo info, int length, double seconds, double *frequencies, Register reg);
 
 #endif

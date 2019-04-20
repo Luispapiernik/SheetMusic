@@ -50,7 +50,7 @@ void note2string(Note note, char **string){
             break;
         default:
             strcpy(*string, "r");
-            break;
+            return;
     }
 
     // se le agrega identificador de la octava
@@ -282,6 +282,9 @@ void parseNote(Note note, MusicalTime t, char **string){
     char *noteName;
     note2string(note, &noteName);
 
+    // se inicializa el string
+    strcpy(*string, "");
+
     if (times[REDONDA_]){
         // se escribe el nombre de la nota
         strcat(*string, noteName);
@@ -378,24 +381,53 @@ void parseNote(Note note, MusicalTime t, char **string){
 }
 
 
-void parseFrequencies(char *filename, int length, double seconds, int tempo, double *frequencies, Register reg){
-    FILE *file = fopen(filename, "w");
-
-    MusicalTime t = seconds2MusicalTime(seconds, tempo);
-
-    fprintf(file, "{\n");
+void joinFrequencies(int length, double *frequencies, int *account){
+    int index = 0;
 
     for(int i = 0; i < length; i++){
-        char *string;
-
-        parseNote(parseFrequency(frequencies[i], reg), t, &string);
-        printf("%s\n", string);
-        fprintf(file, "%s", string);
-        
-        free(string);
+        account[i] = 0;
     }
     
 
+    while(index < length){
+        for(int i = index; i < length; i++){
+            if (frequencies[i] != frequencies[i + 1]){
+                if (frequencies[i] != frequencies[i + 1])
+                    account[index]++;
+
+                index = i;
+                break;
+            }
+            account[index]++;
+        }
+        index++;
+    }
+}
+
+
+void parseFrequencies(MusicSheetInfo info, int length, double seconds, double *frequencies, Register reg){
+    FILE *file = fopen(info.filename, "w");
+
+    fprintf(file, "\\version \"2.18.2\"\n");
     fprintf(file, "{\n");
+    fprintf(file, "\\tempo 4 = %d\n", info.tempo);
+
+    int account[length];
+    joinFrequencies(length, frequencies, account);
+
+    for(int i = 0; i < length; i++){
+        if (account[i]){
+            char *string;
+
+            Note note = parseFrequency(frequencies[i], reg);
+            MusicalTime t = seconds2MusicalTime(account[i] * seconds, info.tempo);
+            parseNote(note, t, &string);
+            fprintf(file, "%s", string);
+
+            free(string);
+        }
+    }
+
+    fprintf(file, "\n}\n");
     fclose(file);
 }

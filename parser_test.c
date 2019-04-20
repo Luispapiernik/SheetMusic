@@ -27,5 +27,4 @@ int main(int argc, char *argv[]){
     parseNote(parseFrequency(33, reg), seconds2MusicalTime(1.75, 120), &string);
 
     printf("%s\n", string);
-
 }

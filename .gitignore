@@ -1,7 +1,21 @@
 # test
 audio_test
 frequency_test
+parser_test
+sheetMusic
+
+# codigos de ayuda
+guia.c
+
+# ayuda acerca de como compilar
 linker.txt
+
+# salida del programa
+*.ly
+*.txt
+
+# editos
+.vscode
 
 # Prerequisites
 *.d
