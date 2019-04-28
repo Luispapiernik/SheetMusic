@@ -46,7 +46,7 @@ int getFrequencies(int channel, Audio *audio, int subLength, double **frequencie
 
     int *dataAt = (int *) malloc(sizeof(int) * subLength);
 
-    for (int i = 0; i < (*audio).frames; i+=subLength){
+    for (int i = 0; i < (*audio).frames - subLength; i+=subLength){
         getChannelAt(channel, audio, i, subLength, &dataAt, False);
 
         for (int j = 0; j < subLength; j++){

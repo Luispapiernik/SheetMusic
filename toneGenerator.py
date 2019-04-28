@@ -10,6 +10,15 @@ import numpy as np
 import math
 
 
+TIMES = {'redonda': 4, 'blanca': 2, 'negra': 1,
+         'corchea': 1 / 2.0, 'semicorchea': 1 / 4.0,
+         'fusa': 1 / 8.0, 'semifusa': 1 / 16.0}
+
+NOTES = {'c': 1, 'cis': 2, 'd': 3, 'dis': 4, 'e': 5,
+         'f': 6, 'fis': 7, 'g': 8, 'gis': 9, 'a': 10,
+         'ais': 11, 'b': 12}
+
+
 def frequency(note, eighth):
     """
     Esta funcion retorna la frecuencia de una nota dada en una octava dada.
@@ -53,9 +62,11 @@ def extend(iterable, length):
 def main():
     parser = ArgumentParser()
 
-    parser.add_argument('filename')
+    parser.add_argument('-i', '--inputfile', default='')
+    parser.add_argument('-o', '--outputfile', default='output.wav')
     parser.add_argument('-a', '--amplitude', type=float, default=5)
     parser.add_argument('-f', '--framerate', type=int, default=44100)
+    parser.add_argument('--tempo', type=int, default=60)
     parser.add_argument('-t', '--times', type=float, default=[1], nargs='*')
     parser.add_argument('-frq', '--frequencies', type=float, default=[],
                         nargs='*')
@@ -66,27 +77,49 @@ def main():
 
     args = parser.parse_args()
 
-    diff = len(args.notes) - len(args.eighths)
-    if diff > 0:
-        extend(args.eighths, diff)
-    if diff < 0:
-        extend(args.notes, abs(diff))
+    if not args.inputfile:
+        diff = len(args.notes) - len(args.eighths)
+        if diff > 0:
+            extend(args.eighths, diff)
+        if diff < 0:
+            extend(args.notes, abs(diff))
 
-    frequencies = [frequency(args.notes[i], args.eighths[i])
-                   for i in range(len(args.notes))]
+        frequencies = [frequency(args.notes[i], args.eighths[i])
+                    for i in range(len(args.notes))]
 
-    frequencies = args.frequencies or frequencies
+        frequencies = args.frequencies or frequencies
 
-    diff = len(frequencies) - len(args.times)
-    if diff > 0:
-        extend(args.times, diff)
+        diff = len(frequencies) - len(args.times)
+        if diff > 0:
+            extend(args.times, diff)
 
-    generateAudioFile(args.filename, args.amplitude, frequencies, args.times,
-                      args.framerate, args.time_separation)
+        generateAudioFile(args.outputfile, args.amplitude, frequencies, args.times,
+                        args.framerate, args.time_separation)
 
-    print('File generated: ')
-    print('\tFrequencies: %s' % frequencies)
-    print('\tTime: %s' % args.times)
+        print('File generated: ')
+        print('\tFrequencies: %s' % frequencies)
+        print('\tTime: %s' % args.times)
+    
+    else:
+        frequencies = []
+        times = []
+
+        with open(args.inputfile, 'r') as file:
+            for line in file:
+                if 'espace' in line:
+                    frequencies.append(0)
+                    times.append(TIMES[line.split()[1]] * 60 / args.tempo)
+                else:
+                    freq = frequency(NOTES[line.split()[0]], int(line.split()[1]))
+                    frequencies.append(freq)
+                    times.append(TIMES[line.split()[2]] * 60 / args.tempo)
+
+        generateAudioFile(args.outputfile, args.amplitude, frequencies, times,
+                          args.framerate, args.time_separation)
+
+        print('File generated: ')
+        print('\tFrequencies: %s' % frequencies)
+        print('\tTime: %s' % times)
 
 
 if __name__ == '__main__':

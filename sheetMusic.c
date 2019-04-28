@@ -78,11 +78,11 @@ int main(int argc, char **argv){
     // opciones 
     static struct argp_option options[] = {
         // archivo de entrada
-        {"inputfile", 'i', "FILENAME", 0, "Archivo de audio", IO},
+        {"inputfile", 'i', "FILENAME", 0, "archivo de audio", IO},
         {"outputfile", 'o', "FILENAME", 0, "nombre del archivo de salida", IO},
-        {"channel", 'c', "CHANNEL", 0, "Canal a analizar", FREQUENCY},
-        {"dt", 'd', "DT", 0, "Division temporal del audio", FREQUENCY},
-        {"tempo", 't', "TEMPO", 0, "Tempo del audio", PARSER},
+        {"channel", 'c', "CHANNEL", 0, "canal a analizar", FREQUENCY},
+        {"dt", 'd', "DT", 0, "division temporal del audio", FREQUENCY},
+        {"tempo", 't', "TEMPO", 0, "tempo del audio", PARSER},
         {"initial-eighth", 'p', "INITIAL_EIGHTH", 0, "Tempo del audio", PARSER},
         {"final-eighth", 'f', "FINAL_EIGHTH", 0, "Tempo del audio", PARSER}
     };
@@ -92,7 +92,7 @@ int main(int argc, char **argv){
 
     Arguments arguments;
     // valores por defecto
-    arguments.outputfile = "output.ly";
+    arguments.outputfile = "output";
     arguments.channel = 0;
     arguments.dt = 0.0625;
     arguments.tempo = 60;
@@ -109,6 +109,7 @@ int main(int argc, char **argv){
 
 void slave(Arguments arguments){
     // se verifica que los argumentos llegaron bien
+    printf("===================informacion argumentos==================\n");
     printf("inputfile: %s\n", arguments.inputfile);
     printf("outputfile: %s\n", arguments.outputfile);
     printf("channel: %d\n", arguments.channel);
@@ -122,6 +123,10 @@ void slave(Arguments arguments){
 
     audio.filename = arguments.inputfile;
     readWavFile(&audio);
+
+    printf("================informacion audio===================\n");
+    showInfo(&audio);
+    printf("====================================================\n");
 
     // extraccion de las frecuencias
     double *frequencies;
@@ -140,7 +145,11 @@ void slave(Arguments arguments){
 
     parseFrequencies(info, length, arguments.dt, frequencies, reg);
 
-    char comand[500];
-    sprintf(comand, "lilypond %s", arguments.outputfile); 
-    system(comand);
+    char comand1[500];
+    char comand2[500];
+    sprintf(comand1, "lilypond %s", arguments.outputfile);
+    system(comand1);
+
+    sprintf(comand2, "evince %s.pdf", arguments.outputfile);
+    system(comand2);
 }
