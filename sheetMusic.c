@@ -25,7 +25,10 @@ typedef struct{
     double dt;
 
     // parser
+    char *title;
     int tempo;
+    int notes;
+    int measure;
     int initial_eighth;
     int final_eighth;
 }Arguments;
@@ -48,8 +51,17 @@ error_t parse_opt(int key, char *arg, struct argp_state *state){
         case 'd':
             arguments -> dt = atof(arg);
             break;
+        case 0:
+            arguments -> title = arg;
+            break;
         case 't':
             arguments -> tempo = atoi(arg);
+            break;
+        case 'n':
+            arguments -> notes = atoi(arg);
+            break;
+        case 'm':
+            arguments -> measure = atoi(arg);
             break;
         case 'p':
             arguments -> initial_eighth = atoi(arg);
@@ -82,7 +94,10 @@ int main(int argc, char **argv){
         {"outputfile", 'o', "FILENAME", 0, "nombre del archivo de salida", IO},
         {"channel", 'c', "CHANNEL", 0, "canal a analizar", FREQUENCY},
         {"dt", 'd', "DT", 0, "division temporal del audio", FREQUENCY},
-        {"tempo", 't', "TEMPO", 0, "tempo del audio", PARSER},
+        {"title", 0, "TITLE", 0, "titulo de la partitura", PARSER},
+        {"tempo", 't', "TEMPO", 0, "tempo de la partitura", PARSER},
+        {"notes", 'n', "NOTES", 0, "notas por compas", PARSER},
+        {"measure", 'm', "MEASURE", 0, "medida del compas", PARSER},
         {"initial-eighth", 'p', "INITIAL_EIGHTH", 0, "Tempo del audio", PARSER},
         {"final-eighth", 'f', "FINAL_EIGHTH", 0, "Tempo del audio", PARSER}
     };
@@ -95,7 +110,10 @@ int main(int argc, char **argv){
     arguments.outputfile = "output";
     arguments.channel = 0;
     arguments.dt = 0.0625;
+    arguments.title = "Title";
     arguments.tempo = 60;
+    arguments.notes = 4;
+    arguments.measure = 4;
     arguments.initial_eighth = 1;
     arguments.final_eighth = 6;
 
@@ -136,14 +154,19 @@ void slave(Arguments arguments){
 
     // construccion del parser
     Register reg;
-    fillRegister(&reg, 1, 7);
+    fillRegister(&reg, arguments.initial_eighth, arguments.final_eighth);
 
     // informacion del music sheet
     MusicSheetInfo info;
     info.filename = arguments.outputfile;
+    info.title = arguments.title;
     info.tempo = arguments.tempo;
+    info.notes = arguments.notes;
+    info.measure = arguments.measure;
 
     parseFrequencies(info, length, arguments.dt, frequencies, reg);
+
+    free(frequencies);
 
     char comand1[500];
     char comand2[500];

@@ -72,6 +72,8 @@ typedef struct{
     
     // body
     int tempo;
+    int notes;
+    int measure;
 }MusicSheetInfo;
 
 void showNote(Note note);

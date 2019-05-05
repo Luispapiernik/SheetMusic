@@ -33,7 +33,10 @@ def generateTone(amplitude, frequency, time, framerate):
     muestreo, y retorna una señal con la frecuencia dada
     """
     t = np.linspace(0, time, framerate * time)
-    data = amplitude * np.sin(2 * np.pi * frequency * t)
+    data = np.zeros(t.size)
+
+    for freq in frequency:
+        data += amplitude * np.sin(2 * np.pi * freq * t)
 
     return data
 
@@ -73,7 +76,7 @@ def main():
     parser.add_argument('-n', '--notes', type=int, default=[1], nargs='*',
                         choices=range(1, 14))
     parser.add_argument('-e', '--eighths', type=int, default=[1], nargs='*')
-    parser.add_argument('-dt', '--time-separation', type=float, default=0)
+    parser.add_argument('-dt', '--time-separation', type=float, default=0.03)
 
     args = parser.parse_args()
 
@@ -84,22 +87,24 @@ def main():
         if diff < 0:
             extend(args.notes, abs(diff))
 
-        frequencies = [frequency(args.notes[i], args.eighths[i])
-                    for i in range(len(args.notes))]
-
-        frequencies = args.frequencies or frequencies
+        if args.frequencies:
+            frequencies = [[freq] for freq in args.frequencies]
+        else:
+            frequencies = [[frequency(args.notes[i], args.eighths[i])]
+                           for i in range(len(args.notes))]
 
         diff = len(frequencies) - len(args.times)
         if diff > 0:
             extend(args.times, diff)
 
-        generateAudioFile(args.outputfile, args.amplitude, frequencies, args.times,
-                        args.framerate, args.time_separation)
+        generateAudioFile(args.outputfile, args.amplitude,
+                          frequencies, args.times,
+                          args.framerate, args.time_separation)
 
         print('File generated: ')
         print('\tFrequencies: %s' % frequencies)
         print('\tTime: %s' % args.times)
-    
+
     else:
         frequencies = []
         times = []
@@ -110,9 +115,17 @@ def main():
                     frequencies.append(0)
                     times.append(TIMES[line.split()[1]] * 60 / args.tempo)
                 else:
-                    freq = frequency(NOTES[line.split()[0]], int(line.split()[1]))
-                    frequencies.append(freq)
-                    times.append(TIMES[line.split()[2]] * 60 / args.tempo)
+                    freqs = []
+                    split_line = line.split()
+                    for i in range(len(split_line) // 3):
+                        freq = frequency(NOTES[split_line[3 * i]], int(split_line[3 * i + 1]))
+                        times.append(TIMES[split_line[3 * i + 2]] * 60 / args.tempo)
+
+                        freqs.append(freq)
+
+                    frequencies.append(freqs)
+
+                    print(frequencies)
 
         generateAudioFile(args.outputfile, args.amplitude, frequencies, times,
                           args.framerate, args.time_separation)

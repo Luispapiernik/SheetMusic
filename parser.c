@@ -208,7 +208,7 @@ int getNumberOfNotes(MusicalTime t, int *times){
         times[BLANCA] = t.blanca;
         if(t.negra){
             number += t.negra - 1;
-            times[NEGRA] = t.blanca - 1;
+            times[NEGRA] = t.negra - 1;
             times[BLANCA_] = 1;
             times[BLANCA]--;
             t.negra = 0;
@@ -220,7 +220,7 @@ int getNumberOfNotes(MusicalTime t, int *times){
         times[NEGRA] = t.negra;
         if(t.corchea){
             number += t.corchea - 1;
-            times[CORCHEA] = t.blanca - 1;
+            times[CORCHEA] = t.corchea - 1;
             times[NEGRA_] = 1;
             times[NEGRA]--;
             t.corchea = 0;
@@ -232,7 +232,7 @@ int getNumberOfNotes(MusicalTime t, int *times){
         times[CORCHEA] = t.corchea;
         if(t.semicorchea){
             number += t.semicorchea - 1;
-            times[SEMICORCHEA] = t.blanca - 1;
+            times[SEMICORCHEA] = t.semicorchea - 1;
             times[CORCHEA_] = 1;
             times[CORCHEA]--;
             t.semicorchea = 0;
@@ -244,7 +244,7 @@ int getNumberOfNotes(MusicalTime t, int *times){
         times[SEMICORCHEA] = t.semicorchea;
         if(t.fusa){
             number += t.fusa - 1;
-            times[FUSA] = t.blanca - 1;
+            times[FUSA] = t.fusa - 1;
             times[SEMICORCHEA_] = 1;
             times[SEMICORCHEA]--;
             t.fusa = 0;
@@ -256,7 +256,7 @@ int getNumberOfNotes(MusicalTime t, int *times){
         times[FUSA] = t.fusa;
         if(t.semifusa){
             number += t.semifusa - 1;
-            times[SEMIFUSA] = t.blanca - 1;
+            times[SEMIFUSA] = t.semifusa - 1;
             times[FUSA_] = 1;
             times[SEMIFUSA]--;
             t.semifusa = 0;
@@ -267,6 +267,19 @@ int getNumberOfNotes(MusicalTime t, int *times){
     times[SEMIFUSA] = t.semifusa;
 
     return number;
+}
+
+
+Bool thereAreNotes(int *times, int time, Note note){
+    if (note.note == 0 && note.eighth == 0)
+        return False;
+
+    for(int i = (time + 1); i < 13; i++){
+        if(times[i])
+            return True;
+    }
+    
+    return False;
 }
 
 
@@ -282,98 +295,221 @@ void parseNote(Note note, MusicalTime t, char **string){
     char *noteName;
     note2string(note, &noteName);
 
+    Bool withLigature;
+
     // se inicializa el string
     strcpy(*string, "");
 
     if (times[REDONDA_]){
+        withLigature = False;
+        if(thereAreNotes(times, REDONDA_, note))
+            withLigature = True;
+
         // se escribe el nombre de la nota
         strcat(*string, noteName);
-        strcat(*string, "1. ");
+        if(withLigature)
+            strcat(*string, "1.~ ");
+        else
+            strcat(*string, "1. ");
     }
 
     if (times[REDONDA]){
+        withLigature = False;
         for(int i = 0; i < times[REDONDA]; i++){
+            if((i  + 2) > times[REDONDA])
+                withLigature = False;
+
+            if(thereAreNotes(times, REDONDA, note))
+                withLigature = True;
+
             // se escribe el nombre de la nota
             strcat(*string, noteName);
-            strcat(*string, "1 ");
+            
+            if(withLigature)
+                strcat(*string, "1~ ");
+            else
+                strcat(*string, "1 ");
         }
     }
 
     if (times[BLANCA_]){
+        withLigature = False;
+        if(thereAreNotes(times, BLANCA_, note))
+            withLigature = True;
+
         // se escribe el nombre de la nota
         strcat(*string, noteName);
-        strcat(*string, "2. ");
+        
+        if(withLigature)
+            strcat(*string, "2.~ ");
+        else
+            strcat(*string, "2. ");
     }
 
     if (times[BLANCA]){
+        withLigature = False;
         for(int i = 0; i < times[BLANCA]; i++){
+            if((i  + 2) > times[BLANCA])
+                withLigature = False;
+
+            if(thereAreNotes(times, BLANCA, note))
+                withLigature = True;
+
             // se escribe el nombre de la nota
             strcat(*string, noteName);
-            strcat(*string, "2 ");
+            
+            if(withLigature)
+                strcat(*string, "2~ ");
+            else
+                strcat(*string, "2 ");
         }
     }
 
     if (times[NEGRA_]){
+        withLigature = False;
+        if(thereAreNotes(times, NEGRA_, note))
+            withLigature = True;
+
         // se escribe el nombre de la nota
         strcat(*string, noteName);
-        strcat(*string, "4. ");
+        
+        if(withLigature)
+            strcat(*string, "4.~ ");
+        else
+            strcat(*string, "4. ");
     }
 
     if (times[NEGRA]){
+        withLigature = False;
         for(int i = 0; i < times[NEGRA]; i++){
+            if((i  + 2) > times[NEGRA])
+                withLigature = False;
+
+            if(thereAreNotes(times, NEGRA, note))
+                withLigature = True;
+
             // se escribe el nombre de la nota
             strcat(*string, noteName);
-            strcat(*string, "4 ");
+            
+            if(withLigature)
+                strcat(*string, "4~ ");
+            else
+                strcat(*string, "4 ");
         }
     }
 
     if (times[CORCHEA_]){
+        withLigature = False;
+        if(thereAreNotes(times, CORCHEA_, note))
+            withLigature = True;
+
         // se escribe el nombre de la nota
         strcat(*string, noteName);
-        strcat(*string, "8. ");
+        
+        if(withLigature)
+            strcat(*string, "8.~ ");
+        else
+            strcat(*string, "8. ");
     }
 
     if (times[CORCHEA]){
+        withLigature = False;
         for(int i = 0; i < times[CORCHEA]; i++){
+            if((i  + 2) > times[CORCHEA])
+                withLigature = False;
+
+            if(thereAreNotes(times, CORCHEA, note))
+                withLigature = True;
+
             // se escribe el nombre de la nota
             strcat(*string, noteName);
-            strcat(*string, "8 ");
+            
+            if(withLigature)
+                strcat(*string, "8~ ");
+            else
+                strcat(*string, "8 ");
         }
     }
 
     if (times[SEMICORCHEA_]){
+        withLigature = False;
+        if(thereAreNotes(times, SEMICORCHEA_, note))
+            withLigature = True;
+
         // se escribe el nombre de la nota
         strcat(*string, noteName);
-        strcat(*string, "16. ");
+        
+        if(withLigature)
+            strcat(*string, "16.~ ");
+        else
+            strcat(*string, "16. ");
     }
 
     if (times[SEMICORCHEA]){
+        withLigature = False;
         for(int i = 0; i < times[SEMICORCHEA]; i++){
+            if((i + 2) > times[SEMICORCHEA])
+                withLigature = False;
+
+            if(thereAreNotes(times, SEMICORCHEA, note))
+                withLigature = True;
+
             // se escribe el nombre de la nota
             strcat(*string, noteName);
-            strcat(*string, "16 ");
+            
+            if(withLigature)
+                strcat(*string, "16~ ");
+            else
+                strcat(*string, "16 ");
         }
     }
 
     if (times[FUSA_]){
+        withLigature = False;
+        if(thereAreNotes(times, FUSA_, note))
+            withLigature = True;
+
         // se escribe el nombre de la nota
         strcat(*string, noteName);
-        strcat(*string, "32. ");
+        
+        if(withLigature)
+            strcat(*string, "32.~ ");
+        else
+            strcat(*string, "32. ");
     }
 
     if (times[FUSA]){
+        withLigature = False;
         for(int i = 0; i < times[FUSA]; i++){
+            if((i  + 2) > times[FUSA])
+                withLigature = False;
+
+            if(thereAreNotes(times, FUSA, note))
+                withLigature = True;
+
             // se escribe el nombre de la nota
             strcat(*string, noteName);
-            strcat(*string, "32 ");
+            
+            if(withLigature)
+                strcat(*string, "32~ ");
+            else
+                strcat(*string, "32 ");
         }
     }
 
     if (times[SEMIFUSA]){
+        withLigature = True;
         for(int i = 0; i < times[SEMIFUSA]; i++){
             // se escribe el nombre de la nota
             strcat(*string, noteName);
-            strcat(*string, "64 ");
+
+            if((i  + 2) > times[SEMIFUSA])
+                withLigature = False;
+            
+            if(withLigature)
+                strcat(*string, "64~ ");
+            else
+                strcat(*string, "64 ");
         }
     }
 
@@ -381,7 +517,15 @@ void parseNote(Note note, MusicalTime t, char **string){
 }
 
 
-void joinFrequencies(int length, double *frequencies, int *account){
+Bool areDifferent(double freq1, double freq2, Register reg){
+    Note note1 = parseFrequency(freq1, reg);
+    Note note2 = parseFrequency(freq2, reg);
+
+    return !(note1.note == note2.note && note1.eighth == note2.eighth);
+}
+
+
+void joinFrequencies(int length, double *frequencies, int *account, Register reg){
     int index = 0;
 
     for(int i = 0; i < length; i++){
@@ -391,8 +535,8 @@ void joinFrequencies(int length, double *frequencies, int *account){
 
     while(index < length){
         for(int i = index; i < length; i++){
-            if (frequencies[i] != frequencies[i + 1]){
-                if (frequencies[i] != frequencies[i + 1])
+            if (areDifferent(frequencies[i], frequencies[i + 1], reg)){
+                if (areDifferent(frequencies[i], frequencies[i + 1], reg))
                     account[index]++;
 
                 index = i;
@@ -405,16 +549,28 @@ void joinFrequencies(int length, double *frequencies, int *account){
 }
 
 
+void checkMeasureTime(MusicalTime t){
+
+}
+
+
 void parseFrequencies(MusicSheetInfo info, int length, double seconds, double *frequencies, Register reg){
     FILE *file = fopen(info.filename, "w");
 
     fprintf(file, "\\version \"2.18.2\"\n");
+
+    // header
+    fprintf(file, "\\header{\n title = %s\n}\n", info.title);
+
+    // body
     fprintf(file, "{\n");
     fprintf(file, "\\tempo 4 = %d\n", info.tempo);
+    fprintf(file, "\\time %d/%d\n", info.notes, info.measure);
 
     int account[length];
-    joinFrequencies(length, frequencies, account);
+    joinFrequencies(length, frequencies, account, reg);
 
+    double measure_time;
     for(int i = 0; i < length; i++){
         if (account[i]){
             char *string;
