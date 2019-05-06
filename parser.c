@@ -549,8 +549,67 @@ void joinFrequencies(int length, double *frequencies, int *account, Register reg
 }
 
 
-void checkMeasureTime(MusicalTime t){
+// esta funcion recibe la duraccion de una nota y retorna cuantas semifusas
+// cubren la nota completa, notas vienen determinadas por 1, 2, 4, 8, 16, 32 y 64
+int intToSemiFusa(int note){
+    int power = 1;
+    while(note * power < 64)
+        power *= 2;
 
+    return power;
+}
+
+
+int MusicalTimeToSemiFusa(MusicalTime t){
+    int time = 0;
+
+    time += intToSemiFusa(1) * t.redonda;
+    time += intToSemiFusa(2) * t.blanca;
+    time += intToSemiFusa(4) * t.negra;
+    time += intToSemiFusa(8) * t.corchea;
+    time += intToSemiFusa(16) * t.semicorchea;
+    time += intToSemiFusa(32) * t.fusa;
+    time += t.semifusa;
+
+    return time;
+}
+
+
+// esta funcion
+int checkMeasureTime(int totalTime, int measure_time, MusicalTime t, MusicalTime **ts){
+    int time = MusicalTimeToSemiFusa(t);
+
+    (*ts) = (MusicalTime *) malloc(sizeof(MusicalTime));
+
+    if(time <= (measure_time - totalTime)){
+        (*ts)[0] = t;
+        return 1;
+    }
+
+    // equivalente de semifusa en segundos
+    double semifusaSeconds = (0.0625 * 60) / t.tempo;
+
+    time -= measure_time - totalTime;
+    (*ts)[0] = seconds2MusicalTime(semifusaSeconds * (measure_time - totalTime), t.tempo);
+
+    int length = (time % measure_time == 0) ?
+                        (time / measure_time) :
+                        (time / measure_time + 1);
+
+    (*ts) = (MusicalTime *) realloc(*ts, sizeof(MusicalTime) * (length + 1));
+    int i = 1;
+    while(time > 0){
+        if (time > measure_time){
+            time -= measure_time;
+            (*ts)[i++] = seconds2MusicalTime(semifusaSeconds * measure_time, t.tempo);
+        }else{
+            (*ts)[i++] = seconds2MusicalTime(semifusaSeconds * time, t.tempo);
+            time = 0;
+        }
+
+    }
+
+    return length + 1;
 }
 
 
@@ -563,27 +622,50 @@ void parseFrequencies(MusicSheetInfo info, int length, double seconds, double *f
     fprintf(file, "\\header{\n title = %s\n}\n", info.title);
 
     // body
-    fprintf(file, "{\n");
+    fprintf(file, "\\score{\n\n\\new Staff {\n");
     fprintf(file, "\\tempo 4 = %d\n", info.tempo);
     fprintf(file, "\\time %d/%d\n", info.notes, info.measure);
 
     int account[length];
     joinFrequencies(length, frequencies, account, reg);
 
-    double measure_time;
+    int measure_time = intToSemiFusa(info.measure) * info.notes;
+    int totalTime = 0;
     for(int i = 0; i < length; i++){
         if (account[i]){
             char *string;
 
             Note note = parseFrequency(frequencies[i], reg);
             MusicalTime t = seconds2MusicalTime(account[i] * seconds, info.tempo);
-            parseNote(note, t, &string);
-            fprintf(file, "%s", string);
+            MusicalTime *ts;
+            int length = checkMeasureTime(totalTime, measure_time, t, &ts);
+
+            for(int j = 0; j < length; j++){
+                totalTime += MusicalTimeToSemiFusa(ts[j]);
+                parseNote(note, ts[j], &string);
+
+                if (totalTime >= measure_time){
+                    if(j + 2 <= length)
+                        fprintf(file, "%s~ | ", string);
+                    else
+                        fprintf(file, "%s| ", string);
+
+                    totalTime = 0;
+                }else{
+                    fprintf(file, "%s", string);
+                }
+            }
 
             free(string);
+            free(ts);
         }
     }
 
     fprintf(file, "\n}\n");
+
+    fprintf(file, "\\layout { }\n");
+    fprintf(file, "\\midi { }\n");
+    fprintf(file, "\n}\n");
+
     fclose(file);
 }
