@@ -90,4 +90,10 @@ void parseNote(Note note, MusicalTime t, char **string);
 
 void parseFrequencies(MusicSheetInfo info, int length, double seconds, double *frequencies, Register reg);
 
+
+
+// solo para test
+int MusicalTimeToSemiFusa(MusicalTime t);
+int getNumberOfNotes(MusicalTime t, int *times);
+int intToSemiFusa(int note);
 #endif

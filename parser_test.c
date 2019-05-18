@@ -17,14 +17,42 @@ int main(int argc, char *argv[]){
     note = parseFrequency(20, reg);
     showNote(note);
 
-    // test parse time
-    printf("\nTest Time Parser\n");
-    showMusicalTime(seconds2MusicalTime(1, 60));
-    showMusicalTime(seconds2MusicalTime(1.75, 120));
+    printf("===========================================\n");
+    // test parser con checkeo de compas
+    MusicalTime t = seconds2MusicalTime(0.187500, 60);
 
-    // test para parse note
-    char *string;
-    parseNote(parseFrequency(33, reg), seconds2MusicalTime(1.75, 120), &string);
+    showMusicalTime(t);
 
-    printf("%s\n", string);
+    printf("tiempo musical: %d\n", MusicalTimeToSemiFusa(t));
+
+    int times[13] = {0};
+
+    int length = getNumberOfNotes(t, times);
+    printf("longitud de notas: %d\n", length);
+    for (int i = 0; i < 13; i++){
+        printf("tiempo: %d\n", times[i]);
+    }
+
+    printf("================================");
+    printf("test int to semifusa\n");
+    printf("redonda: %d\n", intToSemiFusa(1));
+    printf("blanca: %d\n", intToSemiFusa(2));
+    printf("negra: %d\n", intToSemiFusa(4));
+    printf("corchea: %d\n", intToSemiFusa(8));
+    printf("semicorchea: %d\n", intToSemiFusa(16));
+    printf("fusa: %d\n", intToSemiFusa(32));
+    printf("semifusa: %d\n", intToSemiFusa(64));
+
+    t = seconds2MusicalTime(2.1, 70);
+    showMusicalTime(t);
+
+    printf("- semifusas: %d\n", MusicalTimeToSemiFusa(t));
+
+    // equivalente de semifusa en segundos
+    double semifusaSeconds = (0.0625 * 60) / t.tempo;
+
+    MusicalTime t2 = seconds2MusicalTime(MusicalTimeToSemiFusa(t) * semifusaSeconds, t.tempo);
+    showMusicalTime(t2);
+    printf("- semifusas: %d\n", MusicalTimeToSemiFusa(t2));
+
 }

@@ -73,6 +73,7 @@ void showNote(Note note){
     free(string);
 }
 
+
 void showRegister(Register reg){
     printf("length: %d\n", reg.length);
 
@@ -86,6 +87,7 @@ void showRegister(Register reg){
 
     free(string);
 }
+
 
 void showMusicalTime(MusicalTime t){
     printf("TIME\n");
@@ -146,17 +148,14 @@ Note parseFrequency(double frequency, Register reg){
   return reg.notNote;
 }
 
-
-MusicalTime seconds2MusicalTime(double seconds, int tempo){
+MusicalTime semiFusaToMusicalTime(int semifusaNumber, int tempo){
     MusicalTime t;
-    t.seconds = seconds;
-    t.tempo = tempo;
 
-    // equivalente de semifusa en segundos
     double semifusaSeconds = (0.0625 * 60) / tempo;
 
-    t.remainder = remainder(seconds, semifusaSeconds);
-    int semifusaNumber = intQuotient(seconds, semifusaSeconds);
+    t.tempo = 0;
+    t.seconds = semifusaSeconds * semifusaNumber;
+    t.remainder = 0;
 
     // en una redonda hay 64 semifusas
     t.redonda = semifusaNumber / 64;
@@ -183,6 +182,23 @@ MusicalTime seconds2MusicalTime(double seconds, int tempo){
     semifusaNumber = semifusaNumber % 2;
 
     t.semifusa = semifusaNumber;
+
+    return t;
+}
+
+MusicalTime seconds2MusicalTime(double seconds, int tempo){
+    MusicalTime t;
+
+    // equivalente de semifusa en segundos
+    double semifusaSeconds = (0.0625 * 60) / tempo;
+
+    int semifusaNumber = intQuotient(seconds, semifusaSeconds);
+
+    t = semiFusaToMusicalTime(semifusaNumber, tempo);
+
+    t.seconds = seconds;
+    t.tempo = tempo;
+    t.remainder = remainder(seconds, semifusaSeconds);
 
     return t;
 }
@@ -258,7 +274,7 @@ int getNumberOfNotes(MusicalTime t, int *times){
             number += t.semifusa - 1;
             times[SEMIFUSA] = t.semifusa - 1;
             times[FUSA_] = 1;
-            times[SEMIFUSA]--;
+            times[FUSA]--;
             t.semifusa = 0;
         }
     }
@@ -586,11 +602,8 @@ int checkMeasureTime(int totalTime, int measure_time, MusicalTime t, MusicalTime
         return 1;
     }
 
-    // equivalente de semifusa en segundos
-    double semifusaSeconds = (0.0625 * 60) / t.tempo;
-
     time -= measure_time - totalTime;
-    (*ts)[0] = seconds2MusicalTime(semifusaSeconds * (measure_time - totalTime), t.tempo);
+    (*ts)[0] = semiFusaToMusicalTime(measure_time - totalTime, t.tempo);
 
     int length = (time % measure_time == 0) ?
                         (time / measure_time) :
@@ -601,12 +614,11 @@ int checkMeasureTime(int totalTime, int measure_time, MusicalTime t, MusicalTime
     while(time > 0){
         if (time > measure_time){
             time -= measure_time;
-            (*ts)[i++] = seconds2MusicalTime(semifusaSeconds * measure_time, t.tempo);
+            (*ts)[i++] = semiFusaToMusicalTime(measure_time, t.tempo);
         }else{
-            (*ts)[i++] = seconds2MusicalTime(semifusaSeconds * time, t.tempo);
+            (*ts)[i++] = semiFusaToMusicalTime(time, t.tempo);
             time = 0;
         }
-
     }
 
     return length + 1;
@@ -641,14 +653,17 @@ void parseFrequencies(MusicSheetInfo info, int length, double seconds, double *f
             int length = checkMeasureTime(totalTime, measure_time, t, &ts);
 
             for(int j = 0; j < length; j++){
-                totalTime += MusicalTimeToSemiFusa(ts[j]);
                 parseNote(note, ts[j], &string);
 
-                if (totalTime >= measure_time){
-                    if(j + 2 <= length)
+                totalTime += MusicalTimeToSemiFusa(ts[j]);                
+
+                if(totalTime >= measure_time){
+                    if(j + 2 <= length){
                         fprintf(file, "%s~ | ", string);
-                    else
+                        }
+                    else{
                         fprintf(file, "%s| ", string);
+                        }
 
                     totalTime = 0;
                 }else{
