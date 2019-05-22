@@ -52,7 +52,7 @@ error_t parse_opt(int key, char *arg, struct argp_state *state){
         case 'd':
             arguments -> dt = atof(arg);
             break;
-        case 'z':
+        case 1:
             arguments -> roundRatio = atof(arg);
             break;
         case 0:
@@ -84,11 +84,11 @@ error_t parse_opt(int key, char *arg, struct argp_state *state){
 
 int main(int argc, char **argv){
     static char doc[] =
-    "Este programa genera una partitura a partir de un arvhivo\
+    "Este programa genera una partitura a partir de un archivo\
     de audio\
     \vEste programa recibe un archivo de audio en el formato WAV\
     en el que esta grabado el sonido de algun instrumento y a\
-    parti de este, se genera un partitura que representa el sonido\
+    partir de este, se genera un partitura que representa el sonido\
     de lo que se grabo.";
 
     // opciones 
@@ -98,13 +98,13 @@ int main(int argc, char **argv){
         {"outputfile", 'o', "FILENAME", 0, "nombre del archivo de salida", IO},
         {"channel", 'c', "CHANNEL", 0, "canal a analizar", FREQUENCY},
         {"dt", 'd', "DT", 0, "division temporal del audio", FREQUENCY},
-        {"round", 'z', "ROUNDRATIO", 0, "especifica a como redondear el tiempo", FREQUENCY},
+        {"round", 1, "ROUNDRATIO", 0, "especifica a como redondear el tiempo", FREQUENCY},
         {"title", 0, "TITLE", 0, "titulo de la partitura", PARSER},
         {"tempo", 't', "TEMPO", 0, "tempo de la partitura", PARSER},
         {"notes", 'n', "NOTES", 0, "notas por compas", PARSER},
         {"measure", 'm', "MEASURE", 0, "medida del compas", PARSER},
-        {"initial-eighth", 'p', "INITIAL_EIGHTH", 0, "Tempo del audio", PARSER},
-        {"final-eighth", 'f', "FINAL_EIGHTH", 0, "Tempo del audio", PARSER}
+        {"initial-eighth", 'p', "INITIAL_EIGHTH", 0, "octava inicial", PARSER},
+        {"final-eighth", 'f', "FINAL_EIGHTH", 0, "octava final", PARSER}
     };
 
     // se crea el parseador
