@@ -11,16 +11,8 @@
 #include "audio.h"
 
 
-void showInfo(Audio *audio){
-    // se imprime informacion relevante de la estructura audio
-    printf("Filename: %s\n", audio -> filename);
-    printf("Channels: %d\n", audio -> channels);
-    printf("Frames: %d\n", audio -> frames);
-    printf("Framerate: %d\n", audio -> framerate);
-
-}
-
-
+// funcion que lee un archivo de audio y carga la estructura audio con
+// la informacion relevante
 void readWavFile(Audio *audio){
     // puntero para abrir el archivo de audio
     SNDFILE *inFile;
@@ -29,11 +21,11 @@ void readWavFile(Audio *audio){
 
     // como se va a abrir el archivo en solo lectura esto debe ser cero
     info.format = 0;
-    // se abre el archivo de nombre audio -> filename
+    // se abre el archivo de nombre audio -> filename como lectura
     inFile = sf_open(audio -> filename, SFM_READ, &info);
     // si no se puede abrir el archivo, se sale del programa
     if (inFile == NULL){
-        printf("Failed to open the file.\n");
+        printf("Failed to open the file %s.\n", audio -> filename);
         exit(-1);
     }
 
@@ -41,6 +33,7 @@ void readWavFile(Audio *audio){
     int frames = audio -> frames = info.frames;
     int channels = audio -> channels = info.channels;
     audio -> framerate = info.samplerate;
+    audio -> seconds = (double) info.frames / info.samplerate;
 
     // se alloca memoria para guardar los datos en la estructura, se necesitan
     // frames * channels espacios de tamaño int
@@ -51,7 +44,17 @@ void readWavFile(Audio *audio){
     sf_close(inFile);
 }
 
+// funcion que muestra informacion de el audio
+void showInfo(Audio *audio){
+    // se imprime informacion relevante de la estructura audio
+    printf("Filename: %s\n", audio -> filename);
+    printf("Channels: %d\n", audio -> channels);
+    printf("Frames: %d\n", audio -> frames);
+    printf("Framerate: %d\n", audio -> framerate);
+    printf("Durations: %lf\n", audio -> seconds);
+}
 
+// funcion que obtiene todos los datos de un canal
 void getChannel(int channel, Audio *audio, int **data, Bool allocate){
     // se alloca memoria para los datos
     if(allocate)
@@ -59,12 +62,12 @@ void getChannel(int channel, Audio *audio, int **data, Bool allocate){
 
     // se itera sobre el numero de datos
     for (int i = 0; i < audio -> frames * audio -> channels; i += audio -> channels){
-        // se escoge el canal y se guarda en data
+            // se escoge el dato en el canal especificado y se guarda en data
             (*data)[i / (audio -> channels)] = audio -> data[i + channel];
     }
 }
 
-
+// funcion que obtiene un determinado numero de datos de un canal desde una posicion determinada
 void getChannelAt(int channel, Audio *audio, int initialFrame, int length, int **data, Bool allocate){
     // se alloca memoria para los datos
     if(allocate)

@@ -19,7 +19,7 @@ int main(int argc, char *argv[]){
 
     printf("===========================================\n");
     // test parser con checkeo de compas
-    MusicalTime t = seconds2MusicalTime(0.187500, 60);
+    MusicalTime t = seconds2MusicalTime(0.187500, 60, 1);
 
     showMusicalTime(t);
 
@@ -43,7 +43,7 @@ int main(int argc, char *argv[]){
     printf("fusa: %d\n", intToSemiFusa(32));
     printf("semifusa: %d\n", intToSemiFusa(64));
 
-    t = seconds2MusicalTime(2.1, 70);
+    t = seconds2MusicalTime(2.1, 70, 1);
     showMusicalTime(t);
 
     printf("- semifusas: %d\n", MusicalTimeToSemiFusa(t));
@@ -51,7 +51,7 @@ int main(int argc, char *argv[]){
     // equivalente de semifusa en segundos
     double semifusaSeconds = (0.0625 * 60) / t.tempo;
 
-    MusicalTime t2 = seconds2MusicalTime(MusicalTimeToSemiFusa(t) * semifusaSeconds, t.tempo);
+    MusicalTime t2 = seconds2MusicalTime(MusicalTimeToSemiFusa(t) * semifusaSeconds, t.tempo, 1);
     showMusicalTime(t2);
     printf("- semifusas: %d\n", MusicalTimeToSemiFusa(t2));
 

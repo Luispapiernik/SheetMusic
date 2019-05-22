@@ -23,6 +23,7 @@ typedef struct{
     // get frequencies
     int channel;
     double dt;
+    double roundRatio;
 
     // parser
     char *title;
@@ -50,6 +51,9 @@ error_t parse_opt(int key, char *arg, struct argp_state *state){
             break;
         case 'd':
             arguments -> dt = atof(arg);
+            break;
+        case 'z':
+            arguments -> roundRatio = atof(arg);
             break;
         case 0:
             arguments -> title = arg;
@@ -94,6 +98,7 @@ int main(int argc, char **argv){
         {"outputfile", 'o', "FILENAME", 0, "nombre del archivo de salida", IO},
         {"channel", 'c', "CHANNEL", 0, "canal a analizar", FREQUENCY},
         {"dt", 'd', "DT", 0, "division temporal del audio", FREQUENCY},
+        {"round", 'z', "ROUNDRATIO", 0, "especifica a como redondear el tiempo", FREQUENCY},
         {"title", 0, "TITLE", 0, "titulo de la partitura", PARSER},
         {"tempo", 't', "TEMPO", 0, "tempo de la partitura", PARSER},
         {"notes", 'n', "NOTES", 0, "notas por compas", PARSER},
@@ -110,6 +115,7 @@ int main(int argc, char **argv){
     arguments.outputfile = "output";
     arguments.channel = 0;
     arguments.dt = 0.0625;
+    arguments.roundRatio = 1;
     arguments.title = "Title";
     arguments.tempo = 60;
     arguments.notes = 4;
@@ -132,6 +138,7 @@ void slave(Arguments arguments){
     printf("outputfile: %s\n", arguments.outputfile);
     printf("channel: %d\n", arguments.channel);
     printf("dt: %lf\n", arguments.dt);
+    printf("roundRatio: %lf\n", arguments.roundRatio);
     printf("tempo: %d\n", arguments.tempo);
     printf("initial eighth: %d\n", arguments.initial_eighth);
     printf("final eighth: %d\n", arguments.final_eighth);
@@ -164,7 +171,7 @@ void slave(Arguments arguments){
     info.notes = arguments.notes;
     info.measure = arguments.measure;
 
-    parseFrequencies(info, length, arguments.dt, frequencies, reg);
+    parseFrequencies(info, length, arguments.dt, frequencies, arguments.roundRatio, reg);
 
     free(frequencies);
 
